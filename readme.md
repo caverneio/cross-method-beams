@@ -1,4 +1,4 @@
-# Beam calculator
+# Basic beam calculator
 
 This project is a simple beam calculator. You can calculate the bending moments at the supports of a beam. This is done using the Hardy Cross method.
 
@@ -26,19 +26,23 @@ cool_beam = Beam(
 
 A beam is composed of sections, which may have loads. The first section is the leftmost one, and the last one is the rightmost one. You can indicate if the sections in the left or right side of the beam are fixed by adding the string "l" or "r" as the third argument of the Section constructor.
 
-Then, you can calculate the bending moments with the following commands:
+### Bending moments on the supports
+
+You can calculate the bending moments with the following commands:
 
 ```python
 moments = cool_beam.getMoments()
 print(moments)
 
 # Output:
-[-14.945, 17.642, 19.171, 17.977]
+[14.945, -17.642, -19.171, -17.977]
 ```
 
 You can pass the number of iterations for the Cross method as the first argument of the `getMoments` method. The default value is 100.
 
 The first value is the bending moment at the leftmost support of the beam, and the last value is the bending moment at the rightmost one.
+
+### Table of iterations for the Cross method
 
 You can also get the cross method table with the following command:
 
@@ -61,11 +65,29 @@ You should pass the number of iterations as the first argument of the `runCrossM
 
 The output is a Pandas DataFrame, so you can use all the methods of this library to manipulate it.
 
+### Reactions on the supports
+
+You can also calculate the reactions on the supports with the following command:
+
+```python
+reactions = cool_beam.getReactions()
+print(reactions)
+
+# Output:
+[14.21, 32.035, 33.425, 15.579]
+```
+
+The first value is the reaction at the leftmost support of the beam, and the last value is the reaction at the rightmost one.
+
+## Do you want to contribute?
+
+If you want to contribute to this project, you can do it by forking this repository and making a pull request. You can also open an issue if you find a bug or you want to suggest a new feature.
+
 ## TODO:
 
 - [x] Calculate bending moments at the supports.
-- [ ] Calculate reactions at the supports
+- [x] Calculate reactions at the supports
 - [ ] Print results in a nice way
 - [ ] Support for more types of loads: point loads, moments, etc.
 
-Author: _@cuevatnt_
+Author: _@cuevatnt_ on Twitter, GitHub and Instagram.

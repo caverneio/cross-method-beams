@@ -1,4 +1,4 @@
-from load import Load
+from lib.classes.loads.load import Load
 
 
 class CentralPointLoad(Load):
@@ -11,4 +11,10 @@ class CentralPointLoad(Load):
 
     def calcFixedEndMoments(self, length):
         value = self.loadMagnitude * length / 8
-        return [-value, value]
+        return [value, -value]
+
+    def calcMomentByLoad(self, length):
+        return self.loadMagnitude * length / 2
+
+    def calcForceByLoad(self, length):
+        return self.loadMagnitude

@@ -1,10 +1,15 @@
 import itertools
 import pandas as pd
 
+from lib.classes.section import Section
+
 
 class Beam:
-    def __init__(self, sections):
+    def __init__(self, sections: list[Section]):
         self.sections = sections
+
+    def __str__(self):
+        return f"Beam: {self.sections}"
 
     def getNumberOfSections(self):
         return len(self.sections)
@@ -13,22 +18,18 @@ class Beam:
         return sum([1 / section.getLength() for section in self.sections])
 
     def getDistributionFactors(self):
+        kl = lambda ind: (1 / self.sections[ind].getLength()) / (
+            (1 / self.sections[ind].getLength())
+            + (1 / self.sections[ind + 1].getLength())
+        )
+
         return (
             [0 if "l" in self.sections[0].getFixedEndSupports() else 1]
             + list(
                 itertools.chain.from_iterable(
                     [
-                        (1 / self.sections[section_index].getLength())
-                        / (
-                            (1 / self.sections[section_index].getLength())
-                            + (1 / self.sections[section_index + 1].getLength())
-                        ),
-                        1
-                        - (1 / self.sections[section_index].getLength())
-                        / (
-                            (1 / self.sections[section_index].getLength())
-                            + (1 / self.sections[section_index + 1].getLength())
-                        ),
+                        kl(section_index),
+                        1 - kl(section_index),
                     ]
                     for section_index in range(self.getNumberOfSections() - 1)
                 )
@@ -90,28 +91,61 @@ class Beam:
 
         return pd.DataFrame(cross_table)
 
-    def getMoments(self, iterations=100):
-        numberOfMoments = self.getNumberOfSections() - 1
+    def _getInternalMomentsCrossMethod(self, iterations):
+        number_moments = self.getNumberOfSections() * 2
 
         cross_table = self.runCrossMethod(iterations)
 
-        moments = [round(cross_table.iloc[:, 0].sum(), 3)]
-        for i in range(numberOfMoments):
-            x = cross_table.iloc[:, i * 2 + 1].sum()
-            moments.append(round(x, 3))
+        internal_moments = []
+        for i in range(number_moments):
+            x = cross_table.iloc[:, i].sum()
+            internal_moments.append(round(x, 3))
 
-        moments.append(round(cross_table.iloc[:, -1].sum(), 3))
+        return internal_moments
+
+    def getMoments(self, iterations=100):
+        number_moments = self.getNumberOfSections() - 1
+
+        internal_moments = self._getInternalMomentsCrossMethod(iterations)
+
+        moments = [internal_moments[0]]
+        for i in range(number_moments):
+            x = internal_moments[i * 2 + 1]
+            moments.append(x)
+
+        moments.append(internal_moments[-1])
 
         return moments
 
-    def getReactions(self):
-        numberOfReactions = self.getNumberOfSections() + 1
+    def _getInternalReactions(self, iterations=100):
+        internal_moments = self._getInternalMomentsCrossMethod(iterations)
 
-        cross_table = self.runCrossMethod(4)
+        num_sections = self.getNumberOfSections()
 
-        reactions = []
-        for i in range(numberOfReactions):
-            x = cross_table.iloc[:, i * 2].sum()
+        internal_reactions = []
+        for i in range(num_sections):
+            Rb = (
+                -(
+                    internal_moments[2 * i]
+                    + internal_moments[2 * i + 1]
+                    - self.sections[i].getMomentsByLoads()
+                )
+                / self.sections[i].getLength()
+            )
+
+            Ra = self.sections[i].getForcesByLoads() - Rb
+            internal_reactions.append(Ra)
+            internal_reactions.append(Rb)
+
+        return internal_reactions
+
+    def getReactions(self, iterations=100) -> list[float]:
+        internal_reactions = self._getInternalReactions(iterations)
+        reactions = [round(internal_reactions[0], 3)]
+        for i in range(self.getNumberOfSections() - 1):
+            x = internal_reactions[i * 2 + 1] + internal_reactions[i * 2 + 2]
             reactions.append(round(x, 3))
+
+        reactions.append(round(internal_reactions[-1], 3))
 
         return reactions
