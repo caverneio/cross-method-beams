@@ -1,8 +1,10 @@
+from typing import List
+
 from lib.classes.loads.load import Load
 
 
 class Section:
-    def __init__(self, length: float, loads: list[Load], fixedEndSupports: str = ""):
+    def __init__(self, length: float, loads: List[Load], fixedEndSupports: str = ""):
         self.length = length
         self.loads = loads
         self.fixedEndSupports = fixedEndSupports

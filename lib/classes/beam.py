@@ -1,3 +1,4 @@
+from typing import List
 import itertools
 import pandas as pd
 
@@ -5,7 +6,7 @@ from lib.classes.section import Section
 
 
 class Beam:
-    def __init__(self, sections: list[Section]):
+    def __init__(self, sections: List[Section]):
         self.sections = sections
 
     def __str__(self):
@@ -108,7 +109,7 @@ class Beam:
 
         internal_moments = self._getInternalMomentsCrossMethod(iterations)
 
-        moments = [internal_moments[0]]
+        moments = [-internal_moments[0]]
         for i in range(number_moments):
             x = internal_moments[i * 2 + 1]
             moments.append(x)
@@ -139,7 +140,7 @@ class Beam:
 
         return internal_reactions
 
-    def getReactions(self, iterations=100) -> list[float]:
+    def getReactions(self, iterations=100) -> List[float]:
         internal_reactions = self._getInternalReactions(iterations)
         reactions = [round(internal_reactions[0], 3)]
         for i in range(self.getNumberOfSections() - 1):

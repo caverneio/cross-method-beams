@@ -5,13 +5,13 @@ from lib.classes.loads.centralPointLoad import CentralPointLoad
 
 cool_beam = Beam(
     [
-        Section(10, [DistributedLoad(4)]),
-        Section(10, [DistributedLoad(4)]),
+        Section(10, [DistributedLoad(4)], "l"),
+        Section(10, [DistributedLoad(4), CentralPointLoad(85)], "r"),
     ]
 )
 
 print("Moments:")
-print(cool_beam.getReactions())
+print(cool_beam.getMoments())
 
 print("Reactions:")
 print(cool_beam.getReactions())

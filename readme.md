@@ -35,7 +35,7 @@ moments = cool_beam.getMoments()
 print(moments)
 
 # Output:
-[14.945, -17.642, -19.171, -17.977]
+[-14.945, -17.642, -19.171, -17.977]
 ```
 
 You can pass the number of iterations for the Cross method as the first argument of the `getMoments` method. The default value is 100.
